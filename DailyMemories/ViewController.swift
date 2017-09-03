@@ -35,64 +35,43 @@ class ViewController: UIViewController {
     }
     
     private func classifyScene(from image: UIImage) {
+        
+        // 1. Create Vision Core ML model
+        guard let model = try? VNCoreMLModel(for: GoogLeNetPlaces().model) else { return }
+        
+        // 2. Create Vision Core ML request
+        let request = VNCoreMLRequest(model: model,
+                                      completionHandler: self.handleClassificationResults)
+    
         guard let cgImage = image.cgImage else {
             fatalError("Unable to convert \(image) to CGImage.")
         }
-        let imageOrientation = UInt32(image.imageOrientation.rawValue)
-        let cgImageOrientation = CGImagePropertyOrientation(rawValue: imageOrientation)!
-        
-        
-        captionLabel.text = "Classifying scene..."
+        let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(image.imageOrientation.rawValue))!
+
+        // 3. Create request handler
+        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
+    
+        // 4. Perform request on handler
+        self.captionLabel.text = "Classifying scene..."
         DispatchQueue.global(qos: .userInitiated).async {
-            let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
             do {
-                try handler.perform([self.sceneClassificationRequest])
+                try handler.perform([request])
             } catch {
-                print("Error performing classification.\n\(error.localizedDescription)")
+                print("Error performing scene classification")
             }
         }
     }
     
-    /* 1. Ask - create Vision + Core ML request, VNCoreMLRequest
-     - Create VNCoreMLModel with EmotiClassifier
-     - Create VNCoreMLRequest with:
-     (1) the VNCoreMLModel that was just created
-     (2) completion handler, handleClassificationResults
-     - Set request's imageCropAndScaleOption to scaleFit since the model expects to see full face
-     - Return request
-     */
-    lazy var sceneClassificationRequest: VNCoreMLRequest = {
-        do {
-            let sceneClassificationMLModel = GoogLeNetPlaces()
-            
-            let sceneClassificationVisionModel = try VNCoreMLModel(for: sceneClassificationMLModel.model)
-            let request = VNCoreMLRequest(model: sceneClassificationVisionModel,
-                                          completionHandler: self.handleClassificationResults)
-            request.imageCropAndScaleOption = .scaleFit
-            return request
-            
-        } catch {
-            fatalError("Error loading Vision ML model: \(error)")
-        }
-    }()
-    
-    /* 3. Results - do something with Vision's results (classifications)
-     - Check to see if there are any VNClassificationObservation results on the requests. Update user if not.
-     - Call updateClassificationLabel with the top 2 classifications
-     Show any other updates to the user that you'd like 💅🏽
-     Make sure UI updates are dispatched on the main queue
-     */
-    func handleClassificationResults(for request: VNRequest, error: Error?) {
-        
+    // 5. Do something with the results
+    private func handleClassificationResults(for request: VNRequest, error: Error?) {
         DispatchQueue.main.async {
             guard let classifications = request.results as? [VNClassificationObservation],
                 classifications.isEmpty != true else {
-                    self.captionLabel.text = "Unable to classify facial expression.\n\(error!.localizedDescription)"
+                    self.captionLabel.text = "Unable to classify scene.\n\(error!.localizedDescription)"
                     return
             }
             self.updateCaptionLabel(classifications)
         }
-        
     }
     
     // MARK: Helper methods
@@ -110,6 +89,7 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let imageSelected = info[UIImagePickerControllerEditedImage] as? UIImage {
+            self.imageView.image = imageSelected
             
             // Kick off Core ML task with image as input
             classifyScene(from: imageSelected)
