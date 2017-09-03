@@ -37,10 +37,11 @@ class ViewController: UIViewController {
     private func classifyScene(from image: UIImage) {
         
         // 1. Create Vision Core ML model
-        guard let model = try? VNCoreMLModel(for: GoogLeNetPlaces().model) else { return }
+        let model = GoogLeNetPlaces()
+        guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
         
         // 2. Create Vision Core ML request
-        let request = VNCoreMLRequest(model: model,
+        let request = VNCoreMLRequest(model: visionCoreMLModel,
                                       completionHandler: self.handleClassificationResults)
     
         guard let cgImage = image.cgImage else {
