@@ -12,25 +12,25 @@ Each of these parts of the sample app correspond to a branch in this repository
 
 1. Make sure you're on the `master` branch. If not,
 
-`git checkout master`
+    `git checkout master`
 
 2. Download `GoogLeNetPlaces.mlmodel`: a machine learning model that can be used to detect the scene of an image from 205 categories
 
-https://developer.apple.com/machine-learning/
+    https://developer.apple.com/machine-learning/
 
-Scroll down to **Places205-GoogleNet** section
+    Scroll down to **Places205-GoogleNet** section
 
-Click **Download Core ML File**
+    Click **Download Core ML File**
 
 3. Import `GoogLeNetPlaces.mlmodel`
 
-Drag `GoogLeNetPlaces.mlmodel` from Downloads folder into the `DailyMemories` Xcode project
+    Drag `GoogLeNetPlaces.mlmodel` from Downloads folder into the `DailyMemories` Xcode project
 
 4. Ensure `GoogLeNetPlaces.mlmodel`'s Target Membership is **DailyMemories**
 
-In Xcode, select `GoogLeNetPlaces.mlmodel`
+    In Xcode, select `GoogLeNetPlaces.mlmodel`
 
-In the `Utilities` `FileInspector` on the right panel, make sure **DailyMemories** is selected 
+    In the `Utilities` `FileInspector` on the right panel, make sure **DailyMemories** is selected 
 
 5. In `ViewController.swift`, starting in `classifyScene` method, fill in 1-5 where 
 `// YOUR CODE GOES HERE` appears 
