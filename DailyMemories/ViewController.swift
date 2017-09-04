@@ -57,7 +57,10 @@ class ViewController: UIViewController {
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
         
         // Perform both requests on handler
-        self.sceneClassificationLabel.text = "Classifying scene..."
+        DispatchQueue.main.async {
+            self.sceneClassificationLabel.text = "Classifying scene..."
+        }
+        
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 try handler.perform([sceneClassificationRequest, faceDetectionRequest])
@@ -86,34 +89,38 @@ class ViewController: UIViewController {
             return
         }
   
-        let updatedFaceBoxViewFrame = self.calculateFaceBoxViewFrame(faceBoundingBox: observation.boundingBox)
         DispatchQueue.main.async {
+            let updatedFaceBoxViewFrame = self.calculateFaceBoxViewFrame(faceBoundingBox: observation.boundingBox)
             self.addFaceBoxView(frame: updatedFaceBoxViewFrame)
         }
         
         // CLASSIFICATION kicks off here 🚀
-        if let croppedFaceCGImage = self.imageView.image?.cgImage?.cropping(to: updatedFaceBoxViewFrame) {
-            if let imageOrientation = self.imageView.image?.imageOrientation,
-            let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(imageOrientation.rawValue)) {
-                self.classifyFacialExpression(cgImage: croppedFaceCGImage, cgImageOrientation: cgImageOrientation)
+        // Need to dispatch to the main queue to access the imageView
+        DispatchQueue.main.async {
+            let updatedFaceBoxViewFrame = self.calculateFaceBoxViewFrame(faceBoundingBox: observation.boundingBox)
+            if let croppedFaceCGImage = self.imageView.image?.cgImage?.cropping(to: updatedFaceBoxViewFrame) {
+                if let imageOrientation = self.imageView.image?.imageOrientation,
+                    let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(imageOrientation.rawValue)) {
+                    self.classifyFacialExpression(cgImage: croppedFaceCGImage, cgImageOrientation: cgImageOrientation)
+                }
             }
         }
     }
     
     func classifyFacialExpression(cgImage: CGImage, cgImageOrientation: CGImagePropertyOrientation) {
-        // Create Vision Core ML request with model
+        // 1. Create Vision Core ML request with EmotiClassifier model
+        
         let model = EmotiClassifier()
         guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
         let expressionClassificationRequest = VNCoreMLRequest(model: visionCoreMLModel,
-                                                         completionHandler: self.handleExpressionClassificationResults)
+                                                              completionHandler: self.handleExpressionClassificationResults)
         
-        // Create request handler
+        // 2. Create request handler
+        
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
         
-        // Perform request on handler
-        DispatchQueue.main.async {
-            self.expressionClassificationLabel.text = "Classifying expression..."
-        }
+        // 3. Perform request on handler
+        // Ensure perform is called on appropriate queue (not main queue)
         
         DispatchQueue.global(qos: .userInitiated).async {
             do {
@@ -122,10 +129,15 @@ class ViewController: UIViewController {
                 print("Error performing scene classification")
             }
         }
+        
+        // 👨🏿‍💻 YOUR CODE GOES HERE
     }
     
-    // Do something with expression classification results
+    // 4. Do something with expression classification results
+    // - Set expressionClassificationLabel's text as the identifier of the request's first result
+    // - Ensure work is done on main queue because we are updating the UI
     private func handleExpressionClassificationResults(for request: VNRequest, error: Error?) {
+        
         DispatchQueue.main.async {
             guard let classifications = request.results as? [VNClassificationObservation],
                 let topClassification = classifications.first else {
@@ -135,6 +147,7 @@ class ViewController: UIViewController {
             
             self.expressionClassificationLabel.text = topClassification.identifier
         }
+        
     }
     
     // MARK: Helper methods
