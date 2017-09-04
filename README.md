@@ -8,7 +8,11 @@ By building this sample app, we will go through 3 ways of adding machine learnin
 
 Each of these parts of the sample app correspond to a branch in this repository
 
-# Part 1 - Using Core ML to classify scene from image
+🚨 If you are debugging in the simulator instead of on an iOS11 device:
+
+in the `takePhoto` function, change the `imagePickerController`'s `sourceType` to `.photoLibrary` 🚨
+
+## Part 1 - Using Core ML to classify scene from image
 
 1. Make sure you're on the `master` branch. If not,
 
@@ -34,3 +38,7 @@ Each of these parts of the sample app correspond to a branch in this repository
 
 5. In `ViewController.swift`, starting in `classifyScene` method, fill in 1-5 where 
 `// YOUR CODE GOES HERE` appears 
+
+## Part 2 - Using Vision to perform face detection in an image
+
+
