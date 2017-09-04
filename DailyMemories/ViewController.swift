@@ -39,29 +39,41 @@ class ViewController: UIViewController {
         // Create Vision Core ML request with model
         let model = GoogLeNetPlaces()
         guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
-        let sceneClassificationRequest = VNCoreMLRequest(model: visionCoreMLModel,
-                                                         completionHandler: self.handleSceneClassificationResults)
+        let sceneClassificationRequest = VNCoreMLRequest(
+          model: visionCoreMLModel,
+          completionHandler: self.handleSceneClassificationResults
+        )
         
         /* 1. Create Vision face detection request
            - completion handler should take in handleFaceDetectionResults */
-        
-        // 👩🏻‍💻 YOUR CODE GOES HERE
+      let faceDetectionRequest = VNDetectFaceRectanglesRequest(
+        completionHandler: self.handleFaceDetectionResults
+      )
         
         // Create request handler
         guard let cgImage = image.cgImage else {
             fatalError("Unable to convert \(image) to CGImage.")
         }
-        let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(image.imageOrientation.rawValue))!
-        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
-        DispatchQueue.main.async {
-            self.captionLabel.text = "Classifying scene, detecting face..."
+        let cgImageOrientation = CGImagePropertyOrientation(
+          rawValue: UInt32(image.imageOrientation.rawValue)
+          )!
+        let handler = VNImageRequestHandler(
+          cgImage: cgImage,
+          orientation: cgImageOrientation
+      )
+      
+      DispatchQueue.main.async {
+          self.captionLabel.text = "Classifying scene, detecting face..."
+      }
+        
+      DispatchQueue.global(qos: .userInitiated).async {
+        do {
+          try handler.perform([sceneClassificationRequest, faceDetectionRequest])
+        } catch {
+          
+          
         }
-        
-        /* 2. Perform both requests on handler
-         - Ensure perform work is dispatched on appropriate queue (not main queue)
-         - */
-        
-        // 👨🏽‍💻 YOUR CODE GOES HERE
+      }
     }
     
     // Do something with scene classification results
@@ -81,7 +93,13 @@ class ViewController: UIViewController {
        - Ensure that it is dispatched on the main queue, because we are updating the UI */
     private func handleFaceDetectionResults(request: VNRequest, error: Error?) {
         
-        // 👨🏽‍💻 YOUR CODE GOES HERE
+      guard let observation = request.results?.first as? VNFaceObservation else {
+        return
+      }
+      
+      DispatchQueue.main.async {
+        self.addFaceBoxView(faceBoundingBox: observation.boundingBox)
+      }
         
     }
     
@@ -101,8 +119,6 @@ class ViewController: UIViewController {
     }
     
     private func addFaceBoxView(faceBoundingBox: CGRect) {
-        self.faceBoxView.removeFromSuperview()
-        
         let faceBoxView = UIView()
         
         let boxViewFrame = transformRectInView(visionRect: faceBoundingBox, view: self.imageView)
@@ -120,12 +136,16 @@ class ViewController: UIViewController {
     }
     
     private func transformRectInView(visionRect: CGRect , view: UIView) -> CGRect {
-        
-        let size = CGSize(width: visionRect.width * view.bounds.width,
-                          height: visionRect.height * view.bounds.height)
-        let origin = CGPoint(x: visionRect.minX * view.bounds.width,
-                             y: (1 - visionRect.minY) * view.bounds.height - size.height)
-        return CGRect(origin: origin, size: size)
+      
+      let size = CGSize(
+        width: visionRect.width * view.bounds.width,
+        height: visionRect.height * view.bounds.height
+      )
+      let origin = CGPoint(
+        x: visionRect.minX * view.bounds.width,
+        y: (1 - visionRect.minY) * view.bounds.height - size.height
+      )
+      return CGRect(origin: origin, size: size)
     }
 }
 
@@ -134,6 +154,7 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let imageSelected = info[UIImagePickerControllerEditedImage] as? UIImage {
             self.imageView.image = imageSelected
+            self.faceBoxView.removeFromSuperview()
             
             
             // Kick off Core ML task with image as input
