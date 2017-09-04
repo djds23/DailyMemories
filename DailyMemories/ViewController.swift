@@ -37,32 +37,52 @@ class ViewController: UIViewController {
     // 👀🤖 VISION + CORE ML WORK STARTS HERE
     private func classifyScene(from image: UIImage) {
         
-        // 1. Create Vision Core ML model
-        
-        // 👩🏻‍💻 YOUR CODE GOES HERE
-        
+      let model = GoogLeNetPlaces()
+      guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
+      
         // 2. Create Vision Core ML request
 
+      let request = VNCoreMLRequest(model: visionCoreMLModel, completionHandler: self.handleClassificationResults)
         // 👨🏽‍💻 YOUR CODE GOES HERE
 
         // 3. Create request handler
         // *First convert image: UIImage to CGImage + get CGImagePropertyOrientation (helper method)*
+      let cgImage = image.cgImage!
+      let cgImageOrientation = self.convertToCGImageOrientation(from: image)
+      let handler = VNImageRequestHandler(
+        cgImage: cgImage,
+        orientation: cgImageOrientation
+      )
         
         // 👨🏼‍💻 YOUR CODE GOES HERE
     
         // 4. Perform request on handler
         // Ensure that it is done on an appropriate queue (not main queue)
-        
-        // 👩🏼‍💻 YOUR CODE GOES HERE
+      self.captionLabel.text = "Classifying scene..."
+      DispatchQueue.global(qos: .userInitiated).async {
+        do {
+          try handler.perform([request])
+        } catch {
+          print("error")
+        }
+      }
     }
     
     // 5. Do something with the results
     // - Update the caption label
     // - Ensure that it is dispatched on the main queue, because we are updating the UI
     private func handleClassificationResults(for request: VNRequest, error: Error?) {
-        
-        // 👨🏿‍💻 YOUR CODE GOES HERE
-        
+      DispatchQueue.main.async {
+        guard let classifications = request.results as? [VNClassificationObservation] else {
+          self.captionLabel.text = "failed to classify"
+          return
+        }
+        if !classifications.isEmpty {
+          self.updateCaptionLabel(classifications)
+        } else {
+          self.captionLabel.text = "no classifications found"
+        }
+      }
     }
     
     // MARK: Helper methods
@@ -86,7 +106,7 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let imageSelected = info[UIImagePickerControllerEditedImage] as? UIImage {
             self.imageView.image = imageSelected
-            
+          
             // Kick off Vision + Core ML task with image as input 🚀
             classifyScene(from: imageSelected)
         }
