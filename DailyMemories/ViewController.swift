@@ -14,15 +14,19 @@ class ViewController: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var dateLabel: UILabel!
-    @IBOutlet var captionLabel: UILabel!
+    @IBOutlet var expressionClassificationLabel: UILabel!
+    @IBOutlet var sceneClassificationLabel: UILabel!
+    @IBOutlet var captureMemoryButton: UIButton!
     var faceBoxView: UIView = UIView()
     let imagePickerController = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        imageView.layer.cornerRadius = 10
+        captureMemoryButton.layer.cornerRadius = 10
         imagePickerController.delegate = self
+        expressionClassificationLabel.text = "how are you today? 🤔"
+        sceneClassificationLabel.text = "where are you today? 🏖"
     }
     
     @IBAction func takePhoto() {
@@ -53,7 +57,7 @@ class ViewController: UIViewController {
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
         
         // Perform both requests on handler
-        self.captionLabel.text = "Classifying scene..."
+        self.sceneClassificationLabel.text = "Classifying scene..."
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 try handler.perform([sceneClassificationRequest, faceDetectionRequest])
@@ -67,11 +71,12 @@ class ViewController: UIViewController {
     private func handleSceneClassificationResults(for request: VNRequest, error: Error?) {
         DispatchQueue.main.async {
             guard let classifications = request.results as? [VNClassificationObservation],
-                classifications.isEmpty != true else {
-                    self.captionLabel.text = "Unable to classify scene.\n\(error!.localizedDescription)"
+                let topClassification = classifications.first else {
+                    self.sceneClassificationLabel.text = "Unable to classify scene.\n\(error!.localizedDescription)"
                     return
             }
-            self.updateCaptionLabel(classifications)
+            
+            self.sceneClassificationLabel.text = "@ \(topClassification.identifier)"
         }
     }
     
@@ -80,35 +85,77 @@ class ViewController: UIViewController {
         guard let observation = request.results?.first as? VNFaceObservation else {
             return
         }
-        
+  
+        let updatedFaceBoxViewFrame = self.calculateFaceBoxViewFrame(faceBoundingBox: observation.boundingBox)
         DispatchQueue.main.async {
-            self.addFaceBoxView(faceBoundingBox: observation.boundingBox)
+            self.addFaceBoxView(frame: updatedFaceBoxViewFrame)
+        }
+        
+        // CLASSIFICATION kicks off here 🚀
+        if let croppedFaceCGImage = self.imageView.image?.cgImage?.cropping(to: updatedFaceBoxViewFrame) {
+            if let imageOrientation = self.imageView.image?.imageOrientation,
+            let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(imageOrientation.rawValue)) {
+                self.classifyFacialExpression(cgImage: croppedFaceCGImage, cgImageOrientation: cgImageOrientation)
+            }
+        }
+    }
+    
+    func classifyFacialExpression(cgImage: CGImage, cgImageOrientation: CGImagePropertyOrientation) {
+        // Create Vision Core ML request with model
+        let model = EmotiClassifier()
+        guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
+        let expressionClassificationRequest = VNCoreMLRequest(model: visionCoreMLModel,
+                                                         completionHandler: self.handleExpressionClassificationResults)
+        
+        // Create request handler
+        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
+        
+        // Perform request on handler
+        DispatchQueue.main.async {
+            self.expressionClassificationLabel.text = "Classifying expression..."
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try handler.perform([expressionClassificationRequest])
+            } catch {
+                print("Error performing scene classification")
+            }
+        }
+    }
+    
+    // Do something with expression classification results
+    private func handleExpressionClassificationResults(for request: VNRequest, error: Error?) {
+        DispatchQueue.main.async {
+            guard let classifications = request.results as? [VNClassificationObservation],
+                let topClassification = classifications.first else {
+                    self.expressionClassificationLabel.text = "Unable to classify expression.\n\(error!.localizedDescription)"
+                    return
+            }
+            
+            self.expressionClassificationLabel.text = topClassification.identifier
         }
     }
     
     // MARK: Helper methods
-    
-    private func updateCaptionLabel(_ classifications: [VNClassificationObservation]) {
-        let topTwoClassifications = classifications.prefix(2)
-        let descriptions = topTwoClassifications.map { classification in
-            return String(format: "  (%.2f) %@", classification.confidence, classification.identifier)
-        }
-        self.captionLabel.text = "Classification:\n" + descriptions.joined(separator: "\n")
-    }
     
     private func convertToCGImageOrientation(from uiImage: UIImage) -> CGImagePropertyOrientation {
         let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(uiImage.imageOrientation.rawValue))!
         return cgImageOrientation
     }
     
-    private func addFaceBoxView(faceBoundingBox: CGRect) {
+    private func calculateFaceBoxViewFrame(faceBoundingBox: CGRect) -> CGRect {
+        let boxViewFrame = transformRectInView(visionRect: faceBoundingBox, view: self.imageView)
+        return boxViewFrame
+    }
+    
+    private func addFaceBoxView(frame: CGRect) {
         self.faceBoxView.removeFromSuperview()
         
         let faceBoxView = UIView()
         styleFaceBoxView(faceBoxView)
         
-        let boxViewFrame = transformRectInView(visionRect: faceBoundingBox, view: self.imageView)
-        faceBoxView.frame = boxViewFrame
+        faceBoxView.frame = frame
         
         imageView.addSubview(faceBoxView)
         self.faceBoxView = faceBoxView

@@ -32,19 +32,22 @@
                                 <attributedString key="attributedText">
                                     <fragment content="September 4, 2017">
                                         <attributes>
-                                            <font key="NSFont" size="18" name="HelveticaNeue-Thin"/>
+                                            <font key="NSFont" size="24" name="HelveticaNeue"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbt-Rg-XBd">
-                                <rect key="frame" x="20" y="427" width="335" height="95"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbt-Rg-XBd">
+                                <rect key="frame" x="20" y="437" width="335" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="dW7-u3-BW4"/>
+                                </constraints>
                                 <attributedString key="attributedText">
-                                    <fragment content="no memory yet :(">
+                                    <fragment content="expression classification label">
                                         <attributes>
-                                            <font key="NSFont" size="18" name="HelveticaNeue"/>
+                                            <font key="NSFont" size="20" name="HelveticaNeue-Thin"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -72,27 +75,47 @@
                                     <action selector="takePhoto" destination="BYZ-38-t0r" eventType="touchUpInside" id="Ej1-Bc-t8V"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LnZ-md-7Xh">
+                                <rect key="frame" x="20" y="462" width="335" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="C34-0g-37x"/>
+                                </constraints>
+                                <attributedString key="attributedText">
+                                    <fragment content="scene classification label">
+                                        <attributes>
+                                            <font key="NSFont" size="20" name="HelveticaNeue-Thin"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="cbt-Rg-XBd" firstAttribute="width" secondItem="gKZ-ER-t5v" secondAttribute="width" id="3pm-DE-fsF"/>
+                            <constraint firstItem="LnZ-md-7Xh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="8hl-qy-zvj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="gKZ-ER-t5v" secondAttribute="trailing" constant="20" id="A5k-Um-VSY"/>
                             <constraint firstItem="gKZ-ER-t5v" firstAttribute="top" secondItem="Sa4-db-aJD" secondAttribute="bottom" constant="20" id="Stm-wf-Rh0"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="NVi-eY-uNL" secondAttribute="bottom" constant="32" id="Y4Q-nW-ZnD"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="LnZ-md-7Xh" secondAttribute="trailing" constant="20" id="aiU-cL-rFo"/>
                             <constraint firstItem="cbt-Rg-XBd" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="dcr-NQ-C7C"/>
                             <constraint firstItem="Sa4-db-aJD" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="f0p-YZ-hmu"/>
                             <constraint firstItem="gKZ-ER-t5v" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="fUw-0A-dJX"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="top" secondItem="Sa4-db-aJD" secondAttribute="top" constant="20" id="j3b-ER-Awz"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Sa4-db-aJD" secondAttribute="trailing" id="lYJ-8Q-6QV"/>
                             <constraint firstItem="NVi-eY-uNL" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="mpd-dJ-8dV"/>
-                            <constraint firstItem="cbt-Rg-XBd" firstAttribute="top" secondItem="gKZ-ER-t5v" secondAttribute="bottom" constant="10" id="zuN-bd-oRj"/>
+                            <constraint firstItem="LnZ-md-7Xh" firstAttribute="top" secondItem="cbt-Rg-XBd" secondAttribute="bottom" id="rvO-Ne-fZM"/>
+                            <constraint firstItem="cbt-Rg-XBd" firstAttribute="top" secondItem="gKZ-ER-t5v" secondAttribute="bottom" constant="20" id="zuN-bd-oRj"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="captionLabel" destination="cbt-Rg-XBd" id="NJe-dy-WoR"/>
+                        <outlet property="captureMemoryButton" destination="NVi-eY-uNL" id="Vyh-hC-8ph"/>
                         <outlet property="dateLabel" destination="gKZ-ER-t5v" id="2xY-0E-vTp"/>
+                        <outlet property="expressionClassificationLabel" destination="cbt-Rg-XBd" id="32R-Dd-AOs"/>
                         <outlet property="imageView" destination="Sa4-db-aJD" id="4se-q1-Njr"/>
+                        <outlet property="sceneClassificationLabel" destination="LnZ-md-7Xh" id="J7T-U7-THH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
