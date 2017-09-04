@@ -34,45 +34,35 @@ class ViewController: UIViewController {
         present(imagePickerController, animated: true, completion: nil)
     }
     
+    // 👀🤖 VISION + CORE ML WORK STARTS HERE
     private func classifyScene(from image: UIImage) {
         
         // 1. Create Vision Core ML model
-        let model = GoogLeNetPlaces()
-        guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
+        
+        // 👩🏻‍💻 YOUR CODE GOES HERE
         
         // 2. Create Vision Core ML request
-        let request = VNCoreMLRequest(model: visionCoreMLModel,
-                                      completionHandler: self.handleClassificationResults)
-    
-        guard let cgImage = image.cgImage else {
-            fatalError("Unable to convert \(image) to CGImage.")
-        }
-        let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(image.imageOrientation.rawValue))!
+
+        // 👨🏽‍💻 YOUR CODE GOES HERE
 
         // 3. Create request handler
-        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
+        // *First convert image: UIImage to CGImage + get CGImagePropertyOrientation (helper method)*
+        
+        // 👨🏼‍💻 YOUR CODE GOES HERE
     
         // 4. Perform request on handler
-        self.captionLabel.text = "Classifying scene..."
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try handler.perform([request])
-            } catch {
-                print("Error performing scene classification")
-            }
-        }
+        // Ensure that it is done on an appropriate queue (not main queue)
+        
+        // 👩🏼‍💻 YOUR CODE GOES HERE
     }
     
     // 5. Do something with the results
+    // - Update the caption label
+    // - Ensure that it is dispatched on the main queue, because we are updating the UI
     private func handleClassificationResults(for request: VNRequest, error: Error?) {
-        DispatchQueue.main.async {
-            guard let classifications = request.results as? [VNClassificationObservation],
-                classifications.isEmpty != true else {
-                    self.captionLabel.text = "Unable to classify scene.\n\(error!.localizedDescription)"
-                    return
-            }
-            self.updateCaptionLabel(classifications)
-        }
+        
+        // 👨🏿‍💻 YOUR CODE GOES HERE
+        
     }
     
     // MARK: Helper methods
@@ -84,6 +74,11 @@ class ViewController: UIViewController {
         }
         self.captionLabel.text = "Classification:\n" + descriptions.joined(separator: "\n")
     }
+    
+    private func convertToCGImageOrientation(from uiImage: UIImage) -> CGImagePropertyOrientation {
+        let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(uiImage.imageOrientation.rawValue))!
+        return cgImageOrientation
+    }
 }
 
 extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -92,7 +87,7 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
         if let imageSelected = info[UIImagePickerControllerEditedImage] as? UIImage {
             self.imageView.image = imageSelected
             
-            // Kick off Core ML task with image as input
+            // Kick off Vision + Core ML task with image as input 🚀
             classifyScene(from: imageSelected)
         }
         
