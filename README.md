@@ -41,4 +41,33 @@ in the `takePhoto` function, change the `imagePickerController`'s `sourceType` t
 
 ## Part 2 - Using Vision to perform face detection in an image
 
+1. `git checkout add-face-detection`
 
+2. In `ViewController.swift`, starting in `classifySceneAndDetectFace` method, fill in 1-3 where 
+`// YOUR CODE GOES HERE` appears 
+
+## Part 3 - Using a custom machine learning model for facial expression recognition from an image
+
+Building off of the face detection, we are going to try to classify the facial expression of the face that was detected.
+
+Facial expression classification uses a machine learning model where:
+
+*input* = cropped image of face
+
+*output* = facial expression (e.g. “Angry”, “Happy”, etc)
+
+*Where do we get a Facial Expression Classification model?*
+
+- Not included in Apple’s  .mlmodel offerings
+
+- Need to use custom model and convert it to .mlmodel
+
+  *Follow README in https://github.com/meghaphone/emotion-recognition-mlmodel*
+  
+  *At the end, you should have a `EmotiClassifier.mlmodel` locally (in your workspace's **emotion-recognition-mlmodel** folder*
+
+1. `git checkout add-facial-expression-classification` 
+2. Drag `EmotiClassifier.mlmodel` into Xcode project
+3. Open `EmotiClassifier.mlmodel` and check `DailyMemories` to be included in Target Membership
+4. In `ViewController.swift`, starting in `classifyFacialExpressionmethod`, fill in 1-5 where 
+`// YOUR CODE GOES HERE` appears 
