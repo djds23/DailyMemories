@@ -42,8 +42,10 @@ class ViewController: UIViewController {
         let sceneClassificationRequest = VNCoreMLRequest(model: visionCoreMLModel,
                                                          completionHandler: self.handleSceneClassificationResults)
         
-        // Create Vision face detection request
-        let faceDetectionRequest = VNDetectFaceRectanglesRequest(completionHandler: self.handleFaceDetectionResults)
+        /* 1. Create Vision face detection request
+           - completion handler should take in handleFaceDetectionResults */
+        
+        // 👩🏻‍💻 YOUR CODE GOES HERE
         
         // Create request handler
         guard let cgImage = image.cgImage else {
@@ -51,16 +53,15 @@ class ViewController: UIViewController {
         }
         let cgImageOrientation = CGImagePropertyOrientation(rawValue: UInt32(image.imageOrientation.rawValue))!
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
-        
-        // Perform both requests on handler
-        self.captionLabel.text = "Classifying scene..."
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try handler.perform([sceneClassificationRequest, faceDetectionRequest])
-            } catch {
-                print("Error performing scene classification")
-            }
+        DispatchQueue.main.async {
+            self.captionLabel.text = "Classifying scene, detecting face..."
         }
+        
+        /* 2. Perform both requests on handler
+         - Ensure perform work is dispatched on appropriate queue (not main queue)
+         - */
+        
+        // 👨🏽‍💻 YOUR CODE GOES HERE
     }
     
     // Do something with scene classification results
@@ -75,15 +76,13 @@ class ViewController: UIViewController {
         }
     }
     
-    // Do something with face detection results
+    /* 3. Do something with face detection results
+       - Add face box view
+       - Ensure that it is dispatched on the main queue, because we are updating the UI */
     private func handleFaceDetectionResults(request: VNRequest, error: Error?) {
-        guard let observation = request.results?.first as? VNFaceObservation else {
-            return
-        }
         
-        DispatchQueue.main.async {
-            self.addFaceBoxView(faceBoundingBox: observation.boundingBox)
-        }
+        // 👨🏽‍💻 YOUR CODE GOES HERE
+        
     }
     
     // MARK: Helper methods
