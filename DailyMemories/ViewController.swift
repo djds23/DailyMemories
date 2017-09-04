@@ -104,13 +104,13 @@ class ViewController: UIViewController {
         self.faceBoxView.removeFromSuperview()
         
         let faceBoxView = UIView()
-        styleFaceBoxView(faceBoxView)
         
         let boxViewFrame = transformRectInView(visionRect: faceBoundingBox, view: self.imageView)
         faceBoxView.frame = boxViewFrame
         
         imageView.addSubview(faceBoxView)
         self.faceBoxView = faceBoxView
+        styleFaceBoxView(faceBoxView)
     }
     
     private func styleFaceBoxView(_ faceBoxView: UIView) {
