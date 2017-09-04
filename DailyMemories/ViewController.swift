@@ -110,25 +110,14 @@ class ViewController: UIViewController {
     func classifyFacialExpression(cgImage: CGImage, cgImageOrientation: CGImagePropertyOrientation) {
         // 1. Create Vision Core ML request with EmotiClassifier model
         
-        let model = EmotiClassifier()
-        guard let visionCoreMLModel = try? VNCoreMLModel(for: model.model) else { return }
-        let expressionClassificationRequest = VNCoreMLRequest(model: visionCoreMLModel,
-                                                              completionHandler: self.handleExpressionClassificationResults)
+        // 👨🏿‍💻 YOUR CODE GOES HERE
         
         // 2. Create request handler
         
-        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: cgImageOrientation)
+        // 👨🏼‍💻 YOUR CODE GOES HERE
         
         // 3. Perform request on handler
         // Ensure perform is called on appropriate queue (not main queue)
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try handler.perform([expressionClassificationRequest])
-            } catch {
-                print("Error performing scene classification")
-            }
-        }
         
         // 👨🏿‍💻 YOUR CODE GOES HERE
     }
@@ -138,15 +127,7 @@ class ViewController: UIViewController {
     // - Ensure work is done on main queue because we are updating the UI
     private func handleExpressionClassificationResults(for request: VNRequest, error: Error?) {
         
-        DispatchQueue.main.async {
-            guard let classifications = request.results as? [VNClassificationObservation],
-                let topClassification = classifications.first else {
-                    self.expressionClassificationLabel.text = "Unable to classify expression.\n\(error!.localizedDescription)"
-                    return
-            }
-            
-            self.expressionClassificationLabel.text = topClassification.identifier
-        }
+        // 👨🏼‍💻 YOUR CODE GOES HERE
         
     }
     
